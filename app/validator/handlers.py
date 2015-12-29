@@ -34,8 +34,9 @@ def swagger_validator(url):
             return (
                 'Deprecated Swagger version. Please visit http://swagger.io '
                 'for information on upgrading to Swagger 2.0', config.UPGRADE_BADGE)
-    except (ValueError, KeyError):
-        return 'Unable to read content. It may be invalid JSON or YAML', config.ERROR_BADGE
+    except Exception as ex:
+        log.error(exception=str(ex))
+        return 'Unable to parse content. It may be invalid JSON or YAML', config.ERROR_BADGE
 
     with open(config.JSON_SCHEMA) as schema:
         swagger_schema = json.loads(schema.read())
