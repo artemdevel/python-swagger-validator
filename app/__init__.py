@@ -14,7 +14,6 @@ class JSONResponse:
         if res.content_type is None:
             res.content_type = 'application/json'
             res.body = json.dumps(res.body, indent=4, separators=(',', ': '))
-            return
 
 
 class IndexHandler:
@@ -23,6 +22,7 @@ class IndexHandler:
         @type req: falcon.Request
         @type res: falcon.Response
         """
+        # Return a list of available endpoints for the root path, just for information.
         res.body = {'paths': ['/validator', '/validator/debug']}
 
 
