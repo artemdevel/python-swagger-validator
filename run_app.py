@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+from wsgiref.simple_server import make_server
+
 from app import create_app
-from werkzeug.serving import run_simple
 
 
 if __name__ == '__main__':
-    app = create_app()
-    run_simple('127.0.0.1', 8000, app, use_reloader=True)
+    make_server('127.0.0.1', 8000, create_app()).serve_forever()
