@@ -1,5 +1,4 @@
 falcon==0.3.0
-Werkzeug==0.10.4
 structlog==15.2.0
 jsonschema==2.5.1
 PyYAML==3.11
