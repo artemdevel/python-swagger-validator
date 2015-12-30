@@ -1,3 +1,4 @@
+import json
 import unittest
 
 import responses
@@ -161,6 +162,37 @@ class TestValidator(unittest.TestCase):
             self.assertEqual(res.status_int, 200)
             self.assertEqual(res.content_type, 'image/png')
             self.assertEqual(res.body, read_badge(config.INVALID_BADGE))
+
+    def test_validator_debug_post_json_ok(self):
+        res = self.app.post_json('/validator/debug', json.loads(VALID_JSON_SCHEMA))
+        self.assertEqual(res.status_int, 200)
+        self.assertEqual(res.content_type, 'application/json')
+        self.assertEqual(res.json, 'OK')
+
+    def test_validator_debug_post_deprecated_json_fail(self):
+        res = self.app.post_json('/validator/debug', json.loads(DEPRECATED_SCHEMA))
+        self.assertEqual(res.status_int, 200)
+        self.assertEqual(res.content_type, 'application/json')
+        self.assertTrue('Deprecated Swagger version.' in res.json)
+
+    def test_validator_debug_post_json_fail(self):
+        res = self.app.post_json('/validator/debug', json.loads(INVALID_JSON_SCHEMA))
+        self.assertEqual(res.status_int, 200)
+        self.assertEqual(res.content_type, 'application/json')
+        self.assertTrue("'info' is a required property" in res.json)
+
+    def test_validator_debug_post_non_json_fail(self):
+        res = self.app.post('/validator/debug', params=VALID_YAML_SCHEMA, content_type='text/html', expect_errors=True)
+        self.assertEqual(res.status_int, 400)
+        self.assertEqual(res.content_type, 'application/json')
+        self.assertEqual(res.json['title'], 'Unsupported or missed content-type header')
+
+    def test_validator_debug_post_malformed_json_fail(self):
+        res = self.app.post(
+            '/validator/debug', params=VALID_YAML_SCHEMA, content_type='application/json', expect_errors=True)
+        self.assertEqual(res.status_int, 500)
+        self.assertEqual(res.content_type, 'application/json')
+        self.assertEqual(res.json['title'], 'Malformed JSON')
 
 
 if __name__ == '__main__':
