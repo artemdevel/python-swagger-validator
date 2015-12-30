@@ -49,6 +49,24 @@ def swagger_validator(url):
     return 'OK', config.VALID_BADGE
 
 
+def swagger_content_validator(spec_body):
+    """ Validate Swagger schema entirely located in spec_body.
+    """
+    version = spec_body['swagger']
+    if version.startswith('1'):
+        return 'Deprecated Swagger version. Please visit http://swagger.io for information on upgrading to Swagger 2.0'
+
+    with open(config.JSON_SCHEMA) as schema:
+        swagger_schema = json.loads(schema.read())
+
+    try:
+        validate(spec_body, swagger_schema)
+    except ValidationError as ex:
+        return str(ex)
+
+    return 'OK'
+
+
 class ValidatorBadgeHandler:
     def on_get(self, req, res):
         """
@@ -73,5 +91,32 @@ class ValidatorDebugHandler:
         res.status = falcon.HTTP_200
         res.cache_control = ["no-cache"]
 
-        result, _ = swagger_validator(url=req.params.get('url'))
+        result, _ = swagger_validator(req.params.get('url'))
         res.body = result
+
+    def on_post(self, req, res):
+        """
+        @type req: falcon.Request
+        @type res: falcon.Response
+        """
+        res.status = falcon.HTTP_200
+        res.cache_control = ["no-cache"]
+
+        if req.content_type is None or 'application/json' not in req.content_type:
+            raise falcon.HTTPBadRequest(
+                title='Unsupported or missed content-type header',
+                description='"application/json" content-type is required')
+
+        try:
+            raw_body = req.stream.read().decode('utf-8')
+        except IOError as ex:
+            log.error(exception=str(ex))
+            raise falcon.HTTPInternalServerError(title='IO Error', description=str(ex))
+
+        try:
+            json_body = json.loads(raw_body, encoding='utf-8')
+        except ValueError as ex:
+            log.error(exception=str(ex))
+            raise falcon.HTTPInternalServerError(title='Malformed JSON', description=str(ex))
+
+        res.body = swagger_content_validator(json_body)
