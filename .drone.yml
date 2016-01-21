@@ -1,4 +1,6 @@
-image: buildpack-deps:jessie-scm
-
-script:
-  - ./scripts/build.sh
+build:
+  image: buildpack-deps:jessie-scm
+  commands:
+    - env
+    - pwd
+    - ./scripts/build.sh
