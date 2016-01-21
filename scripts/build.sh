@@ -13,4 +13,4 @@ export DOCKER_TLS_VERIFY=1
 export DOCKER_CERT_PATH=$BUILD_DIR/certs
 
 docker build -t python_swagger_validator .
-docker run --name swagger-validator -e APP_ADDR=0.0.0.0 -dp 127.0.0.1:7777:8000 python_swagger_validator
+docker run --name swagger-validator -e APP_ADDR=0.0.0.0 -dp 7777:8000 python_swagger_validator
