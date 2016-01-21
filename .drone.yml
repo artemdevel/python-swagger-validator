@@ -1,3 +1,4 @@
+# Simple build script
 image: python:slim
 
 script:
