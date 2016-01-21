@@ -3,7 +3,8 @@ image: python:slim
 
 script:
   - ./scripts/build.sh
+  - ./scripts/deploy.sh
 
-deploy:
-  script:
-    - ./scripts/deploy.sh
+#deploy:
+#  script:
+#    - ./scripts/deploy.sh
