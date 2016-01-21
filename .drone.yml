@@ -1,10 +1,4 @@
-# Simple build script
-image: python:slim
+image: buildpack-deps:jessie-scm
 
 script:
   - ./scripts/build.sh
-  - ./scripts/deploy.sh
-
-#deploy:
-#  script:
-#    - ./scripts/deploy.sh
