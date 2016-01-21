@@ -1,3 +1,9 @@
 image: python:slim
+
 script:
-  - echo 'HELLO'
+  - ./scripts/build.sh
+
+deploy:
+  bash:
+    script:
+      - ./scripts/deploy.sh
